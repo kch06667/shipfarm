@@ -31,6 +31,7 @@ Node가 없으면 `python3 -m http.server 8000 --bind 127.0.0.1`로도 실행할
 - **쉼터**: 풀밭 6마리와 별도로 6 → 12 → 24마리까지 쉬는 자리 확장. 상태를 보존하며 옮기고, 풀밭이 가득 차면 친구끼리 교대합니다.
 - **NPC 이웃 마을**: 미셸·켈리·케이티의 목장 방문. 이웃마다 하루 세 가지 도움, 한국 시간 자정 기준 갱신.
 - **목장 앨범**: 수확·판매·이웃 도움·수집 등 여덟 가지 기록과 한 번씩 받는 선물.
+- **웹판 분위기의 목장**: 선명한 잔디, 해바라기 꽃길, 초콜릿 체크 타일과 입체적인 메뉴 테두리. 당시 캡처를 참고해 새로 그린 화면이며 원본 그래픽 복구는 아닙니다.
 - **꾸미기와 풍경**: 꽃밭·새집·버섯 조명·벤치 배치, 낮·살구빛 노을·별빛 저녁 선택.
 - **양들의 놀이터**: 스프링 쉽·시소·TV를 놓으면 양이 스스로 찾아가 놉니다. 장식을 눌러 선택한 양을 보낼 수도 있고, 기구마다 다른 반응을 보여요. 사용 중인 자리는 다른 양이 기다립니다. 2011년 웹판 리뷰를 참고해 새로 만든 그림·가격·모션입니다. [놀이터 미리보기](docs/preview-playground.png)
 - **모바일·접근성**: 일곱 메뉴의 작은 화면 배치, 키보드 포커스, 이름 문자 이스케이프, 기기의 동작 줄이기 설정 지원.
@@ -39,13 +40,13 @@ Node가 없으면 `python3 -m http.server 8000 --bind 127.0.0.1`로도 실행할
 
 ## 미리보기
 
-[낮 목장](docs/preview-v5-farm.png) · [별빛 목장](docs/preview-v5-night.png) · [양털 장터](docs/preview-v5-market.png) · [쉼터](docs/preview-v5-barn.png) · [이웃 마을](docs/preview-v5-village.png) · [색상 선택](docs/preview-v5-colors.png) · [모바일](docs/preview-v5-mobile.png)
+[새 목장 화면](docs/preview-classic-farm.png) · [새 모바일 화면](docs/preview-classic-mobile.png) · [낮 목장](docs/preview-v5-farm.png) · [별빛 목장](docs/preview-v5-night.png) · [양털 장터](docs/preview-v5-market.png) · [쉼터](docs/preview-v5-barn.png) · [이웃 마을](docs/preview-v5-village.png) · [색상 선택](docs/preview-v5-colors.png) · [모바일](docs/preview-v5-mobile.png)
 
 미리보기는 기능 확인용 진행 데이터를 사용합니다. 새 플레이는 레벨 1의 아기양 한 마리로 시작합니다.
 
 ## 개발과 검증
 
-게임 코드는 `src/game.js`, 작물 부패는 `src/crop-life.js`, 놀이기구는 `src/farm-toys.js`, 먹이 재고·요청은 `src/food-pantry.js`, 다음 행동 안내·밭 정리는 `src/play-guide.js`, 스타일은 `src/style.css`, 화면 골격은 `src/shell.html`, 내장 이미지는 `src/assets.json`에서 수정합니다. `index.html`은 생성된 배포 파일입니다.
+게임 코드는 `src/game.js`, 목장 색상·꽃길은 `src/farm-scenery.js`, 작물 부패는 `src/crop-life.js`, 놀이기구는 `src/farm-toys.js`, 먹이 재고·요청은 `src/food-pantry.js`, 다음 행동 안내·밭 정리는 `src/play-guide.js`, 스타일은 `src/style.css`, 화면 골격은 `src/shell.html`, 내장 이미지는 `src/assets.json`에서 수정합니다. `index.html`은 생성된 배포 파일입니다.
 
 ```sh
 npm ci

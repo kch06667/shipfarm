@@ -97,7 +97,7 @@
 
 ## 코드와 저장을 수정할 때 주의점
 
-- 수정 원본: `src/game.js`, `src/crop-life.js`, `src/farm-toys.js`, `src/food-pantry.js`, `src/play-guide.js`, `src/style.css`, `src/shell.html`, `src/assets.json`. 빌더가 모두 단일 HTML에 내장한다.
+- 수정 원본: `src/game.js`, `src/farm-scenery.js`, `src/crop-life.js`, `src/farm-toys.js`, `src/food-pantry.js`, `src/play-guide.js`, `src/style.css`, `src/shell.html`, `src/assets.json`. 빌더가 모두 단일 HTML에 내장한다.
 - 작물은 `ready + cropFreshSeconds[crop]`에 부패하며 `spoiled: true`를 기록해 시간 역행에 되살아나지 않게 한다. `stats.clear`는 쭉정이 정리 횟수다. 모두 선택적 필드여서 이전 저장에도 대응한다. 작물 경과에는 양의 2시간 오프라인 상한을 적용하지 않는다.
 - 생성 결과: `index.html`. 직접 수정하면 다음 빌드에 사라진다.
 - 빌더: `scripts/build.cjs`. 로컬 실행기: `scripts/serve.cjs`.
@@ -110,6 +110,7 @@
 - 기존 이야기 함수는 장 수 **3**을 전제로 한다. ‘선과 악 7/7’ 같은 7장 이야기를 붙일 때 진행 UI·완료 판정·백업 검사까지 일반화해야 한다.
 - 먹이 저장: 선택 필드 `foodStock`(8종), 양의 `foodWish`, `stats.favorite`를 추가했다. `food`는 전체 수량이며 종류별 합과의 차이는 이전 저장의 혼합 먹이다. 수확은 `receiveCropFood`, 일반 납품은 `spendAnyFood`를 사용해 합계와 종류별 재고를 함께 갱신한다. 직접 합계만 변경하지 않는다. 백업은 종류별 합계 초과를 거절한다.
 - 먹이 요청은 캬라멜팝콘부터 정해진 순서로 바뀐다. 5개 소비·포만감 25·털 25, 요청 일치 시 추가 털 10·경험치 3은 시안 규칙이다. 튜토리얼 보상은 기존 그대로이며 실제 원작 공식은 추가 조사 대상이다.
+- 시각 후속: `farm-scenery.js`에서 해바라기 테두리와 원작 캡처 참고 색상표를 생성한다. 낮/밤/노을 팔레트 적용 순서를 보존한다. 집·밭·양의 좌표와 저장 규칙은 바꾸지 않았다. 다음 단계는 원본에 가까운 기구 탑승 위치, 촘촘한 배치와 건물 외형이며 현재 일러스트는 여전히 재구성이다.
 - 놀이기구는 장식 ID 4(스프링 쉽), 5(시소), 6(TV)다. 가격 260/320/400, 놀이 4/6/8초와 한 자리 한 마리 규칙은 시안용이다. `toyAvailable`은 접근 중에도 자리를 예약하며, 회수/교체 때 `cancelSlotVisitors`로 예약과 경로를 함께 해제한다. 이 상태는 저장하지 않아 재접속 시 양이 다시 자유롭게 움직인다.
 - 생활 주기: 포만감 40초당 1, 청결 90초당 1, 털 8초당 1. 포만감 15 이하/청결 20 이하일 때 자연 털 성장 중단. 모두 시안용이다.
 - 테스트의 진행 데이터 주입은 검증용이다. 시작 목장을 고레벨/많은 코인으로 바꾸지 않는다.
