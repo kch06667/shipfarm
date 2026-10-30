@@ -1,0 +1,13 @@
+{
+  "name": "shipfarm-personal-prototype",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Offline personal sheep-farming game prototype",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "start": "node scripts/serve.cjs",
+    "test": "node tests/run.cjs"
+  },
+  "engines": {"node": ">=20"},
+  "devDependencies": {"playwright": "1.62.1"}
+}
