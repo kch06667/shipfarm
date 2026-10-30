@@ -95,7 +95,7 @@ function updateVitals(){if(tab!=='farm')return;const s=state.sheep[state.selecte
  const feed=$('[aria-label="먹이 주기"]');if(feed)feed.disabled=!!s.pendingFeed||s.hunger>99.5;
  const ready=state.plots.filter(p=>p&&p.ready<=Date.now()).length;const status=$('#lifeSummary');if(status)status.textContent=ready?`수확할 작물 ${ready}칸이 기다려요.`:'양도 작물도 천천히 자라는 중이에요.';
 }
-function render(){ensureProgression();document.body.dataset.light=state.light??'day';const weather=$('.weather');if(weather)weather.textContent=state.light==='night'?'☾ 별빛 · 반딧불이 쉬어 가는 저녁':state.light==='sunset'?'◒ 노을 · 살구빛이 내려앉은 목장':'☀ 맑음 · 달콤한 바람이 부는 오후';advanceLife();renderBase();updateRequestSidebar();if(tab==='farm'){const head=$('.selected-info h3');head?.insertAdjacentHTML('beforeend','<button class="rename-btn" onclick="sheepJournal()" aria-label="선택한 양 수첩">✎</button>');$('.selected-info small')?.insertAdjacentHTML('afterend','<div class="care-state"></div>');updateVitals();updatePlots();updateHarvestButton();} }
+function render(){ensureProgression();document.body.dataset.light=state.light??'day';const weather=$('.weather');if(weather)weather.textContent=state.light==='night'?'☾ 별빛 · 반딧불이 쉬어 가는 저녁':state.light==='sunset'?'◒ 노을 · 살구빛이 내려앉은 목장':'☀ 맑음 · 달콤한 바람이 부는 오후';advanceLife();renderBase();updateRequestSidebar();const villageView=$('.village-view');if(villageView)villageView.dataset.helpDay=helpDay();if(tab==='farm'){$('.actiontray')?.insertAdjacentHTML('beforebegin',firstSaleGuide());const head=$('.selected-info h3');head?.insertAdjacentHTML('beforeend','<button class="rename-btn" onclick="sheepJournal()" aria-label="선택한 양 수첩">✎</button>');$('.selected-info small')?.insertAdjacentHTML('afterend','<div class="care-state"></div>');updateVitals();updatePlots();updateHarvestButton();} }
 function farm(){let html=farmBase();html=html.replace('<div class="scene">',flockStrip()+'<div class="scene">');html=html.replace('<span class="scene-label">',decorLayer()+'<span class="scene-label">');html=html.replace('</div></div>'+guideBand(),'</div></div>'+guideBand()+decorPalette());html+=`<div class="life-bar"><span id="lifeSummary"></span>${tutStep()>=8?'<button class="wool-shortcut" onclick="navigate(\'market\')">양털 창고 '+woolTotal()+'묶음</button><button onclick="plantAll()">빈 밭 모두 심기</button><button id="bulkHarvest" class="bulk-harvest" onclick="harvestAll()">모두 수확</button>':''}<span><b>♧ ${crops[state.seed][0]}</b> · 먹이 ${state.food}개</span>${tutStep()>=8?'<button class="mobile-edit" onclick="toggleDecor()">'+(decorating?'꾸미기 마치기':'목장 꾸미기')+'</button>':'<button onclick="focusTutorial()">지금 할 일 찾기 ↗</button>'}</div>`;return html}
 function focusTutorial(){if(tutStep()===0)return nameBaby();if([4,5].includes(tutStep())){const slot=state.tutorial.plot??0,el=$(`[data-plot="${slot}"]`);el?.scrollIntoView({block:'center',inline:'center',behavior:reducedMotion.matches?'instant':'smooth'});el?.focus({preventScroll:true})}else{$('.actiontray')?.scrollIntoView({block:'center',behavior:reducedMotion.matches?'instant':'smooth'});$('.action.hint')?.focus({preventScroll:true})}}
 function plantSvg(grown,cropId=0,progress=0){const leaf='<path d="M35 49V25M35 37Q18 25 21 39Q28 43 35 42M35 32Q51 19 49 33Q44 39 35 38" fill="#a5ba65" stroke="#74894e" stroke-width="2"/>';let plant='';
@@ -136,7 +136,22 @@ function validBackup(raw){const v=raw?.format==='shipfarm-backup'?raw.state:null
 }
 function importPrompt(){importCandidate=null;modal('<h2>저장한 목장 불러오기</h2><p>먼저 파일을 확인하고, 적용하기 전에 한 번 더 물어볼게요. 현재 목장은 파일로 저장해 두는 것을 권해요.</p><input class="backup-input" id="backupFile" type="file" accept=".json,application/json"><p class="error-text" id="importError" role="status"></p>');$('#backupFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>1000000){$('#importError').textContent='목장 파일은 1MB 이하만 불러올 수 있어요.';return}try{const candidate=validBackup(JSON.parse(await file.text()));importCandidate=candidate;modal(`<h2>이 목장으로 바꿀까요?</h2><p>풀밭 ${candidate.sheep.length}마리 · 쉼터 ${candidate.barn?.sheep.length??0}마리<br>${Math.floor(candidate.coins).toLocaleString()}코인<br>현재 브라우저의 목장 진행을 이 파일로 바꿉니다.</p><button class="greenbtn" onclick="confirmImport()">이 목장 불러오기</button> <button class="action" onclick="document.querySelector('dialog').close()">취소</button>`)}catch(error){$('#importError').textContent='불러오지 못했어요. 올바른 쉽팜 목장 파일인지 확인해 주세요.'}}}
 function confirmImport(){if(!importCandidate)return;state=importCandidate;importCandidate=null;motion.clear();decorating=false;tab='farm';migrateState();advanceLife();$('#modal').close();render();growBabies();toast('저장한 목장으로 돌아왔어요.')}
-function tickWorld(){advanceLife();updateVitals();updatePlots();updateHarvestButton();if(Date.now()-lastUiSecond>10000){lastUiSecond=Date.now();save()}}
+function tickWorld(){advanceLife();updateVitals();updatePlots();updateHarvestButton();refreshNeighborDay();if(Date.now()-lastUiSecond>10000){lastUiSecond=Date.now();save()}}
+
+function refreshNeighborDay(){
+ const view=$('.village-view');
+ if(tab==='village'&&view&&Number(view.dataset.helpDay)!==helpDay()){
+  const focused=document.activeElement;
+  const task=focused?.closest('.help-task');
+  const index=task?[...document.querySelectorAll('.help-task')].indexOf(task):-1;
+  render();
+  if(index>=0)document.querySelectorAll('.help-task')[index]?.focus({preventScroll:true});
+ }
+}
+function firstSaleGuide(){
+ if(tutStep()<8||state.stats.sold>0||!woolTotal())return '';
+ return `<div class="first-sale-guide"><div><strong>첫 양털이 창고에 도착했어요!</strong><p>이제부터 깎은 털은 창고에 모여요. 장터에서 팔아 새 친구를 맞이할 코인을 모아 보세요.</p></div><button class="greenbtn" onclick="navigate('market')">첫 양털 팔러 가기</button></div>`;
+}
 
 const orderTemplates=[
  {title:'켈리의 간식 바구니',from:'켈리',kind:'food',goal:10,coins:160,xp:18,icon:'♧',text:'달콤한 먹이 10개를 보내 주세요.'},
@@ -280,5 +295,5 @@ migrateState();setInterval(growBabies,300);requestAnimationFrame(animate);
 
 setInterval(tickWorld,1000);render();
 window.addEventListener('pagehide',()=>{advanceLife();save()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){advanceLife();growBabies();updateVitals();updatePlots();save()}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){advanceLife();growBabies();updateVitals();updatePlots();refreshNeighborDay();save()}});
 reducedMotion.addEventListener('change',()=>{if(reducedMotion.matches)motion.forEach((m,i)=>{if(m.pending==='eat'){m.x=58;m.y=61;arrive(i,m)}else if(m.mode==='walking'){m.route=null;m.mode='idle';m.until=performance.now()+2500}syncActor(i,m)})});
