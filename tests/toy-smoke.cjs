@@ -1,0 +1,42 @@
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const assert=require('node:assert/strict'),{chromium}=require('playwright');
+const ROOT=path.resolve(__dirname,'..');
+(async()=>{
+ const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/html; charset=utf-8');res.end(fs.readFileSync(ROOT+'/index.html'))});
+ await new Promise(r=>server.listen(8138,'127.0.0.1',r));let browser;
+ try{
+  browser=await chromium.launch(require('./browser-options.cjs'));
+  const p=await browser.newPage({viewport:{width:1440,height:1100},reducedMotion:'reduce'}),errors=[];
+  p.on('pageerror',e=>errors.push(e.message));await p.goto('http://127.0.0.1:8138');
+  await p.evaluate(()=>{state=fresh();state.tutorial.step=8;state.sheep[0]={breed:0,name:'몽실',stage:'adult',growth:100,hunger:80,clean:90,wool:20};render()});
+  await p.locator('.map-edit').click();
+  await p.getByRole('button',{name:'스프링 쉽 260 코인',exact:true}).click();
+  await p.getByRole('button',{name:'장식 자리 4',exact:true}).click();
+  assert.equal(await p.evaluate(()=>state.coins),1740);
+  await p.locator('.map-edit').click();
+  await p.getByRole('button',{name:'장식 자리 4: 스프링 쉽',exact:true}).click();
+  assert.equal(await p.evaluate(()=>getMotion(0).mode),'playing');
+  assert.equal(await p.locator('[data-sheep="0"] .bubble').textContent(),'♪');
+  assert.equal(await p.locator('.sheep.playing .actor').evaluate(el=>getComputedStyle(el).animationName),'none');
+  const before=await p.evaluate(()=>[state.coins,state.xp,state.food,state.stats.pet]);
+  await p.evaluate(()=>visitToy(3));assert.deepEqual(await p.evaluate(()=>[state.coins,state.xp,state.food,state.stats.pet]),before);
+  assert(await p.evaluate(()=>!!validBackup({format:'shipfarm-backup',state})));
+  await p.reload();assert.equal(await p.evaluate(()=>state.decor[3]),4);
+  console.log('PASS: spring toy purchase, interaction, no reward exploit, reduced motion, save and backup');
+  await p.emulateMedia({reducedMotion:'no-preference'});
+  await p.evaluate(()=>{window.originalRandom=Math.random;Math.random=()=>0;const m=getMotion(0);m.x=45;m.y=76;m.mode='idle';m.until=performance.now()-1;m.pending=null;});
+  await p.waitForFunction(()=>getMotion(0).pending==='play'||getMotion(0).mode==='playing');
+  await p.waitForFunction(()=>getMotion(0).mode==='playing',null,{timeout:8000});
+  await p.evaluate(()=>Math.random=window.originalRandom);
+  await p.screenshot({path:ROOT+'/docs/preview-spring-toy.png',fullPage:true});
+  assert(await p.evaluate(()=>getMotion(0).x>=30&&getMotion(0).x<=64&&getMotion(0).y<=78));
+  console.log('PASS: autonomous toy visit follows lawn bounds and plays on arrival');
+  await p.waitForFunction(()=>!getMotion(0).pending,null,{timeout:10000});
+  await p.evaluate(()=>{state.sheep[0].sleepUntil=Date.now()+6000;render()});
+  assert.equal(await p.evaluate(()=>startToyVisit(0,3)),false);
+  await p.evaluate(()=>{delete state.sheep[0].sleepUntil;decorating=true;chosenDecor=-1;placeDecor(3)});
+  assert.equal(await p.evaluate(()=>state.coins),2000);
+  assert.equal(await p.evaluate(()=>state.decor[3]),null);
+  assert.deepEqual(errors,[]);console.log('PASS: sleeping sheep cannot play; toy can be reclaimed without losing sheep');
+ }finally{if(browser)await browser.close();await new Promise(r=>server.close(r))}
+})().catch(e=>{console.error(e);process.exitCode=1});

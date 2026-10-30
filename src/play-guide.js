@@ -3,13 +3,15 @@ let cropChangeCandidate=null;
 function farmGoals(){
  if(tutStep()<8)return [];
  const goals=[],add=(id,title,text,button,run)=>goals.push({id,title,text,button,run});
- const ready=state.plots.filter(p=>p&&p.ready<=Date.now()).length;
+ const ready=state.plots.filter(cropIsReady).length;
+ const spoiled=state.plots.filter(p=>cropPhase(p)==='spoiled').length;
+ if(spoiled)add('clear','수확을 놓친 작물이 썩었어요',`${spoiled}칸은 먹이로 얻을 수 없어요. 쭉정이를 치운 뒤 다시 심어 주세요.`,'쭉정이 모두 치우기',()=>clearAllSpoiled());
  if(ready)add('harvest','달콤한 수확이 기다려요',`${ready}칸의 작물을 수확해 먹이를 채워 주세요.`,'모두 수확하기',()=>harvestAll());
  const baby=state.sheep.findIndex(s=>s.stage==='baby'&&!s.sleepUntil);
  if(baby>=0)add('baby','작은 친구가 기다려요',`${state.sheep[baby].name}에게 인사하고 우유와 낮잠으로 키워 주세요.`,'아기양 돌보기',()=>focusSheep(baby));
  const hungry=state.sheep.findIndex(s=>s.stage==='adult'&&s.hunger<=25&&!s.pendingFeed);
  if(hungry>=0&&state.food>=5)add('feed','꼬르륵, 배가 고파요',`${state.sheep[hungry].name}에게 먹이 5개를 주세요.`,'배고픈 양 찾기',()=>focusSheep(hungry));
- if(state.food<5&&!ready){
+ if(state.food<5&&!ready&&!spoiled){
   const empty=state.plots.findIndex(p=>!p);
   if(empty>=0)add('food','먹이부터 준비해 볼까요?','캬라멜팝콘은 1분 후 먹이 5개를 수확해요.','1분 작물 심기',()=>{state.seed=7;plot(empty)});
   else{
@@ -53,12 +55,12 @@ function updateFarmGoals(){
 function runFarmGoal(id){farmGoals().find(g=>g.id===id)?.run()}
 function inspectCrop(i){
  const p=state.plots[i];if(!p||tutStep()<8)return;
- if(p.ready<=Date.now())return plot(i);
+ if(cropPhase(p)!=='growing')return plot(i);
  cropChangeCandidate=null;
  modal(`<h2>${crops[p.crop][0]}가 자라고 있어요</h2><div class="crop-inspect-art">${plantSvg(false,p.crop,cropProgress(p))}</div><p>수확까지 ${timeLeft(p)} · 먹이 ${crops[p.crop][1]}개</p><p>다른 작물을 심고 싶다면 밭을 비울 수 있어요. 지금 자라는 작물은 수확하지 못합니다.</p><div class="settings-grid"><button class="action" onclick="confirmCropChange(${i},false)">밭 비우기</button><button class="greenbtn" onclick="confirmCropChange(${i},true)">1분 작물로 바꾸기</button></div>`);
 }
 function confirmCropChange(i,replant){
- const p=state.plots[i];if(!p||p.ready<=Date.now()||tutStep()<8)return;
+ const p=state.plots[i];if(!p||cropPhase(p)!=='growing'||tutStep()<8)return;
  cropChangeCandidate={i,p,replant:!!replant};
  modal(`<h2>${replant?'캬라멜팝콘으로 바꿀까요?':'이 밭을 비울까요?'}</h2><p>현재 심은 <b>${crops[p.crop][0]}</b>와 지금까지의 성장 시간은 사라져요. 먹이·코인·경험치는 받지 않습니다.</p><p>${replant?'새 캬라멜팝콘은 1분 후 수확할 수 있어요.':'빈 밭에는 선택한 씨앗을 다시 심을 수 있어요.'}</p><div class="settings-grid"><button class="greenbtn" onclick="applyCropChange()">${replant?'확인하고 바꾸기':'확인하고 비우기'}</button><button class="action" onclick="cancelCropChange()">취소</button></div>`);
 }
@@ -68,7 +70,7 @@ function applyCropChange(){
  if(!candidate||tutStep()<8)return;
  const {i,p,replant}=candidate;
  if(state.plots[i]!==p)return;
- if(p.ready<=Date.now()){$('#modal').close();return toast('그사이 작물이 다 자랐어요. 밭을 눌러 수확해 주세요.')}
+ if(cropPhase(p)!=='growing'){$('#modal').close();render();return toast(cropPhase(p)==='spoiled'?'그사이 작물이 썩었어요. 쭉정이를 치워 주세요.':'그사이 작물이 다 자랐어요. 밭을 눌러 수확해 주세요.')}
  const now=Date.now();state.plots[i]=replant?{crop:7,plantedAt:now,ready:now+60000}:null;
  $('#modal').close();render();toast(replant?'캬라멜팝콘을 심었어요. 1분 뒤 만나요!':'밭을 비웠어요. 새 씨앗을 심어 보세요.');
 }
