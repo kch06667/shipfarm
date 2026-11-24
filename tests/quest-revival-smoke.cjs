@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict'),{chromium}=require('playwright');
+const ROOT=path.resolve(__dirname,'..');
+(async()=>{const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/html; charset=utf-8');res.end(fs.readFileSync(ROOT+'/index.html'))});await new Promise(r=>server.listen(8149,'127.0.0.1',r));let browser;try{
+browser=await chromium.launch(require('./browser-options.cjs'));const p=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('http://127.0.0.1:8149');
+await p.evaluate(()=>{state=fresh();state.tutorial.step=8;state.levelBase=30;state.coins=30000;state.sheep[0]={breed:0,name:'몽실',stage:'adult',growth:100,hunger:90,clean:90,wool:100};state.claimed.push('flame','angel','devil','pirate');navigate('quests')});
+assert.equal(await p.locator('.story-journey').count(),14);assert.equal(await p.locator('#story-goodEvil .chapter-dots i').count(),7);
+await p.locator('#story-goodEvil').getByRole('button',{name:'이야기 시작'}).click();await p.getByRole('button',{name:'이 부탁 맡기'}).click();
+for(let i=0;i<7;i++){await p.evaluate(i=>{if(i)beginChapter('goodEvil',i);const c=storyDefs.goodEvil.chapters[i];if(c.kind==='food')state.food=100;else countQuestStat(c.kind,c.goal);render()},i);await p.locator('#story-goodEvil').getByRole('button',{name:i===6?'이야기 마치기':'부탁 완료'}).click()}
+assert(await p.evaluate(()=>state.claimed.includes('goodEvil')));await p.reload();assert.equal(await p.evaluate(()=>state.story.goodEvil.step),7);await p.evaluate(()=>{reviveNeighbor(0);reviveNeighbor(0)});assert.equal(await p.evaluate(()=>state.stats.revive),1);
+await p.evaluate(()=>{state.claimed.push('legend');navigate('quests')});await p.getByRole('button',{name:'양상자 상점'}).click();await p.locator('#modalBody .quest-card').first().getByRole('button',{name:'열기'}).click();await p.getByRole('button',{name:'확인',exact:true}).click();assert.equal(await p.evaluate(()=>state.sheep.length),2);assert.deepEqual(errors,[]);console.log('PASS: historical quest catalog, seven chapters, saved progress, daily revival, mystery box');
+}finally{if(browser)await browser.close();await new Promise(r=>server.close(r))}})().catch(e=>{console.error(e);process.exitCode=1});
