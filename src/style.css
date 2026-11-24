@@ -36,3 +36,16 @@ body[data-light=sunset] .world{background:radial-gradient(ellipse at 55% 35%,#f8
 
 /* Web-era candy-box framing; original screenshot-inspired reconstruction. */
 body{background:#dce9bd;background-image:radial-gradient(#b7cc8c 1px,transparent 1px);background-size:12px 12px}header{height:80px}.greeting{margin:4px 0 15px}.greeting h1{font-size:23px}.board{border:3px solid #89633f;border-radius:13px;box-shadow:0 5px 0 #6f502b26}.boardbar{background:linear-gradient(#fff1c7,#edcf8d);border-bottom:3px solid #a17a45;padding:10px 16px}.tab{color:#72502f;font-weight:700;border:1px solid transparent}.tab.active{background:linear-gradient(#92b85a,#608b37);border:1px solid #50762d;box-shadow:inset 0 2px #c9df92,0 2px #4c702c;color:#fff9df}.card{border:2px solid #b3945f;border-radius:12px;background:#fff3d2;box-shadow:inset 0 0 0 3px #fff9e7}.scene-label,.map-edit{border:2px solid #8b733d;background:#fff2be;color:#4e6a2e}.scene-label{font-weight:700}.world .backdrop{pointer-events:none}.cropplot .timer{border:1px solid #947140;background:#fff0bceF;color:#503b25}.sheep .name{color:#304b1e;text-shadow:0 1px #fffacb,1px 0 #fffacb,-1px 0 #fffacb}.action{border:2px solid #b39258;background:linear-gradient(#fffbea,#f4dfa7);box-shadow:0 2px #d2b477}.action.primary{background:linear-gradient(#eff8cc,#c2db8d);border-color:#7c9b4a}.actiontray{background:#fff3d3}.flock-strip{background:#f5e8bc}.track{background:#dbcd9f}.track i{background:linear-gradient(#b2d86b,#769f38)}@media(max-width:600px){header{height:70px}.boardbar{padding:4px}.greeting h1{font-size:21px}.board{border-width:2px}.tabs .tab{padding:11px 3px}}
+
+/* Extended parcels keep home scenery at its original physical size. */
+.land-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 14px;background:#f4e4b5;border-bottom:1px solid #b99c64;font-size:11px}
+.land-toolbar strong{margin-right:auto}.land-toolbar button{padding:7px 10px;font-size:11px}
+.world[data-land="1"]{width:150%;min-width:1275px;aspect-ratio:1440/540}
+.world[data-land="2"]{width:200%;min-width:1700px;aspect-ratio:1920/540}
+.world[data-land="1"],.world[data-land="2"]{background-color:#a4c66c;background-image:radial-gradient(#80a94c 1px,transparent 1px),linear-gradient(0deg,#8caf59,#b5d67b 75%,#d3e7a2);background-size:20px 20px,100% 100%}
+.scene .world[data-land="1"] svg.backdrop{width:66.6666667%}
+.scene .world[data-land="2"] svg.backdrop{width:50%}
+.world[data-land="1"]::before,.world[data-land="2"]::before{content:"";position:absolute;left:47%;right:0;top:60%;height:7%;background:repeating-linear-gradient(90deg,#d4aa69 0 22px,#e8c589 22px 44px);border-block:2px solid #b39255;pointer-events:none}
+.world[data-land="2"]::before{left:35%}
+.world .decor-slot.move-selected{outline:3px solid #efad3f;background:#fff5a377}
+body[data-light=night] .world[data-land="1"],body[data-light=night] .world[data-land="2"]{background-color:#607a68;background-image:radial-gradient(#79957c 1px,transparent 1px),linear-gradient(#536c74,#739568)}

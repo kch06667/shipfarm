@@ -9,7 +9,7 @@ function springSheepSvg(){return `<svg viewBox="0 0 80 80" aria-hidden="true"><e
 function startToyVisit(i,slot){
  const s=state.sheep[i];if(tutStep()<8||!s||s.sleepUntil||!toyAvailable(slot,i))return false;
  const m=getMotion(i);if(m.pending)return false;
- const [x,y]=decorSpots[slot],targetX=clamp(x+8,30,64);
+ const [x,y]=decorSpots[slot],targetX=clamp(x+8,30,landMaxX());
  m.route={x:targetX,y:clamp(y+2,targetX<40?54:44,78)};
  m.toySlot=slot;m.toyKind=state.decor[slot];m.pending='play';m.mode='walking';m.until=0;
  if(reducedMotion.matches){m.x=m.route.x;m.y=m.route.y;arrive(i,m)}
