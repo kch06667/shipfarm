@@ -49,3 +49,5 @@ body{background:#dce9bd;background-image:radial-gradient(#b7cc8c 1px,transparent
 .world[data-land="2"]::before{left:35%}
 .world .decor-slot.move-selected{outline:3px solid #efad3f;background:#fff5a377}
 body[data-light=night] .world[data-land="1"],body[data-light=night] .world[data-land="2"]{background-color:#607a68;background-image:radial-gradient(#79957c 1px,transparent 1px),linear-gradient(#536c74,#739568)}
+
+.sheep.playing[data-toy="7"] .actor{animation:pool-splash .9s ease-in-out infinite}.toy-slot.in-use .pool-ripple{animation:pool-ripple 1.1s ease-in-out infinite}@keyframes pool-splash{50%{transform:translateY(-5px) rotate(3deg)}}@keyframes pool-ripple{50%{opacity:.3;transform:translateX(3px)}}@media(prefers-reduced-motion:reduce){.sheep.playing[data-toy="7"] .actor,.toy-slot.in-use .pool-ripple{animation:none}}
