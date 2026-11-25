@@ -3,6 +3,7 @@ let cropChangeCandidate=null;
 function farmGoals(){
  if(tutStep()<8)return [];
  const goals=[],add=(id,title,text,button,run)=>goals.push({id,title,text,button,run});
+ if(!laborAvailable())add('labor','미쉘의 노동력이 부족해요','시간이 지나면 회복돼요. 푸딩이 있다면 바로 먹을 수 있어요.','푸딩·노동력',()=>openLabor());
  const ready=state.plots.filter(cropIsReady).length;
  const spoiled=state.plots.filter(p=>cropPhase(p)==='spoiled').length;
  if(spoiled)add('clear','수확을 놓친 작물이 썩었어요',`${spoiled}칸은 먹이로 얻을 수 없어요. 쭉정이를 치운 뒤 다시 심어 주세요.`,'쭉정이 모두 치우기',()=>clearAllSpoiled());
@@ -29,8 +30,8 @@ function farmGoals(){
   const q=quests.find(q=>!state.claimed.includes(q.id));
   add('story','다음 친구는 플레임램',q?`${q.title} · ${Math.min(state.stats[q.id],q.goal)}/${q.goal}. 세 부탁을 마치면 새 이야기가 열려요.`:'세 부탁을 마쳤어요! 이야기에서 플레임램을 해금하세요.','첫 이야기 이어가기',()=>navigate('quests'));
  }else{
-  const next=Object.entries(storyDefs).find(([id])=>!state.claimed.includes(id));
-  if(next){const [id,def]=next,r=state.story[id],c=def.chapters[r?.step??0];add('story',def.title,r?.active?`${c.text} · ${storyProgress(id)}/${c.goal}`:`${breeds[def.breed].name}을 만나는 이야기를 시작해 보세요.`,'이야기 이어가기',()=>navigate('quests'))}
+  const next=Object.entries(storyDefs).find(([id])=>!state.claimed.includes(id)&&storyAvailable(id));
+  if(next){const [id,def]=next,r=state.story[id],c=def.chapters[r?.step??0];add('story',def.title,r?.active?`${c.text} · ${storyProgress(id)}/${c.goal}`:`${storyReward(def)} · 이야기를 시작해 보세요.`,'이야기 이어가기',()=>navigate('quests'))}
   else add('collection','다음 복슬복슬한 만남',`현재 레벨 ${currentLevel()} · 양 도감에서 새 친구의 조건을 확인하세요.`,'양 도감으로',()=>navigate('sheep'));
  }
  if(state.orders.entries.some(e=>orderProgress(e)>=orderTemplates[e.template].goal))add('order','완료한 부탁의 보상이 있어요','이웃에게 소식을 전하고 코인과 경험치를 받으세요.','부탁 확인하기',()=>navigate('quests'));
@@ -71,6 +72,6 @@ function applyCropChange(){
  const {i,p,replant}=candidate;
  if(state.plots[i]!==p)return;
  if(cropPhase(p)!=='growing'){$('#modal').close();render();return toast(cropPhase(p)==='spoiled'?'그사이 작물이 썩었어요. 쭉정이를 치워 주세요.':'그사이 작물이 다 자랐어요. 밭을 눌러 수확해 주세요.')}
- const now=Date.now();state.plots[i]=replant?{crop:7,plantedAt:now,ready:now+60000}:null;
+ const now=Date.now();state.plots[i]=replant?{crop:7,plantedAt:now,ready:now+60000}:null;if(replant)countQuestStat('plant');
  $('#modal').close();render();toast(replant?'캬라멜팝콘을 심었어요. 1분 뒤 만나요!':'밭을 비웠어요. 새 씨앗을 심어 보세요.');
 }

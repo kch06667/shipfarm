@@ -1,6 +1,6 @@
 // Historical crop durations, interpreted as the harvest window AFTER growth.
 // See docs/original-game-research.md for evidence and remaining uncertainty.
-const cropFreshSeconds=[3600,14400,43200,28800,64800,129600,128600,5400];
+const cropFreshSeconds=[3600,14400,43200,28800,64800,129600,128600,5400,86400,3600,32400,128600,108000,157800];
 function cropExpiresAt(p){return p.ready+cropFreshSeconds[p.crop]*1000}
 function cropPhase(p,now=Date.now()){
  if(!p)return 'empty';
@@ -25,7 +25,7 @@ function timeLeft(p){
 function spoiledPlantSvg(){return `<svg viewBox="0 0 70 70" aria-hidden="true"><path d="M4 46L35 31L67 46L35 63Z" fill="#9d8467" stroke="#78624f" stroke-width="2"/><path d="M35 49Q38 31 28 28Q18 26 22 36M36 44Q45 31 51 39M34 40L25 42" fill="none" stroke="#7d704d" stroke-width="3" stroke-linecap="round"/><path d="M22 36Q14 34 18 43Q23 44 22 36ZM49 37Q56 35 54 46Q48 46 49 37ZM25 41Q17 40 20 46Q26 48 25 41Z" fill="#a49666"/><ellipse cx="43" cy="48" rx="8" ry="4" fill="#847053"/><path d="M17 50l7 4m24-2l5-3" stroke="#c1aa80" stroke-width="2"/></svg>`}
 function clearSpoiledPlot(i){
  decayCrops();const p=state.plots[i];if(cropPhase(p)!=='spoiled')return;
- state.plots[i]=null;state.stats.clear=(state.stats.clear??0)+1;
+ if(!spendLabor())return;state.plots[i]=null;state.stats.clear=(state.stats.clear??0)+1;
  if(tutStep()===5&&i===(state.tutorial.plot??0))state.tutorial.step=4;
  render();toast('썩은 작물의 쭉정이를 치웠어요. 먹이는 얻지 못했지만, 다시 심을 수 있어요.');
 }
@@ -33,8 +33,8 @@ function clearAllSpoiled(){
  if(tutStep()<8)return;
  decayCrops();const indexes=state.plots.map((p,i)=>cropPhase(p)==='spoiled'?i:-1).filter(i=>i>=0);
  if(!indexes.length)return;
- for(const i of indexes)state.plots[i]=null;
- state.stats.clear=(state.stats.clear??0)+indexes.length;render();toast(`쭉정이 ${indexes.length}칸을 치웠어요. 새 씨앗을 심어 주세요.`);
+ let count=0;for(const i of indexes){if(!spendLabor())break;state.plots[i]=null;count++}if(!count)return;
+ state.stats.clear=(state.stats.clear??0)+count;render();toast(`쭉정이 ${count}칸을 치웠어요. 새 씨앗을 심어 주세요.`);
 }
 function updatePlots(){
  if(tab!=='farm')return;

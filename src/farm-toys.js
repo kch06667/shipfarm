@@ -1,6 +1,6 @@
 // Spring Sheep, seesaw and TV are documented in the 2011 web review.
 // Artwork, prices, durations and one-visitor reservations are prototype designs.
-function isFarmToy(id){return id===4||id===5||id===6}
+function isFarmToy(id){return id===4||id===5||id===6||id===7}
 function toyAvailable(slot,i){return isFarmToy(state.decor[slot])&&![...motion.entries()].some(([j,m])=>j!==i&&m.toySlot===slot&&(m.pending==='play'||m.mode==='playing'))}
 function cancelToyVisit(m){m.pending=null;m.route=null;m.mode='idle';m.until=performance.now()+2000;delete m.toySlot;delete m.toyKind}
 function cancelSlotVisitors(slot){motion.forEach((m,i)=>{if(m.toySlot===slot&&(m.pending==='play'||m.mode==='playing')){cancelToyVisit(m);syncActor(i,m)}})}
@@ -9,7 +9,7 @@ function springSheepSvg(){return `<svg viewBox="0 0 80 80" aria-hidden="true"><e
 function startToyVisit(i,slot){
  const s=state.sheep[i];if(tutStep()<8||!s||s.sleepUntil||!toyAvailable(slot,i))return false;
  const m=getMotion(i);if(m.pending)return false;
- const [x,y]=decorSpots[slot],targetX=clamp(x+8,30,64);
+ const [x,y]=decorSpots[slot],targetX=clamp(x+8,30,landMaxX());
  m.route={x:targetX,y:clamp(y+2,targetX<40?54:44,78)};
  m.toySlot=slot;m.toyKind=state.decor[slot];m.pending='play';m.mode='walking';m.until=0;
  if(reducedMotion.matches){m.x=m.route.x;m.y=m.route.y;arrive(i,m)}
@@ -26,3 +26,6 @@ function tryToyWalk(i){
 }
 function seesawSvg(){return `<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="68" rx="34" ry="8" fill="#66834230"/><path d="M28 65L40 42L53 65Z" fill="#f1c56f" stroke="#a17a50" stroke-width="2"/><circle cx="40" cy="46" r="4" fill="#a17a50"/><g class="seesaw-beam"><path d="M7 44H73" stroke="#a77850" stroke-width="9" stroke-linecap="round"/><path d="M7 41H73" stroke="#e8bd83" stroke-width="5" stroke-linecap="round"/><path d="M15 35V43M65 35V43" stroke="#8c9f65" stroke-width="4"/><path d="M9 31H21M59 31H71" stroke="#8c9f65" stroke-width="5" stroke-linecap="round"/><path d="M3 39H12M68 39H77" stroke="#de969c" stroke-width="7" stroke-linecap="round"/></g></svg>`}
 function farmTvSvg(){return `<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="71" rx="29" ry="7" fill="#66834230"/><path d="M24 63L21 73M58 63L61 73" stroke="#9b7755" stroke-width="5"/><path d="M37 18L25 6M40 18L52 4" stroke="#a08c73" stroke-width="3" stroke-linecap="round"/><rect x="8" y="18" width="66" height="47" rx="9" fill="#c99170" stroke="#87694f" stroke-width="2"/><rect x="14" y="24" width="43" height="33" rx="8" fill="#405956" stroke="#f2dbad" stroke-width="3"/><g class="tv-picture"><path d="M17 47Q29 34 40 44L54 40V53H17Z" fill="#91b77d"/><circle cx="24" cy="33" r="5" fill="#f7dc92"/><path d="M32 42Q28 35 35 34Q40 30 44 36Q51 35 49 42Z" fill="#fff1d2"/><path d="M35 41V46M45 41V46" stroke="#806e59" stroke-width="2"/></g><circle cx="65" cy="31" r="4" fill="#f6dda7"/><circle cx="65" cy="43" r="3" fill="#f6dda7"/><path d="M61 53H68M61 57H68" stroke="#87694f" stroke-width="2"/></svg>`}
+
+// Pool is documented in the 2011 review; this vector art and timing are new.
+function farmPoolSvg(){return '<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="68" rx="34" ry="7" fill="#66834230"/><ellipse cx="40" cy="48" rx="34" ry="22" fill="#c89137" stroke="#91662f" stroke-width="2"/><ellipse cx="40" cy="42" rx="34" ry="20" fill="#f6ce63" stroke="#b78b3b" stroke-width="2"/><ellipse cx="40" cy="42" rx="27" ry="15" fill="#83c8dc" stroke="#e4f4ee" stroke-width="2"/><path class="pool-ripple" d="M20 43Q28 38 37 43T56 43M30 49Q40 45 49 49" fill="none" stroke="#e0f6f9" stroke-width="2"/><circle cx="55" cy="37" r="7" fill="#ed936c" stroke="#a96c4b"/><path d="M51 31L58 43" stroke="#fff2c9" stroke-width="3"/></svg>'}
