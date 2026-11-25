@@ -57,3 +57,5 @@ body[data-light=night] .world[data-land="1"],body[data-light=night] .world[data-
 .labor-pill{cursor:pointer;white-space:nowrap;font-size:12px;color:#806027;background:#fff2c7;border-color:#b3945f}.labor-pill:hover{background:#ffe6a4}@media(max-width:720px){.labor-pill{padding:6px;font-size:10px}.topright{flex-wrap:wrap;justify-content:flex-end}.brand{min-width:100px}}
 
 .family-pill{font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff3d2;color:#657447}.family-profiles{display:grid;gap:8px;margin:15px 0}.family-profiles article{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #dfd3ba;border-radius:8px;padding:9px 12px}.family-profiles strong{overflow-wrap:anywhere}.family-profiles .action{white-space:nowrap}#familyForm{margin-top:18px}@media(max-width:720px){header{height:auto!important;min-height:76px;padding-block:8px}.family-pill{font-size:10px;max-width:100px;padding:6px 8px}}
+
+.sheep.doll-sheep.sleeping .actor{animation:breathe 3.5s ease-in-out infinite;transform:none}.catalog-item .cost-note{font-size:10px;color:#8f795d;line-height:1.5}

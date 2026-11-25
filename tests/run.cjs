@@ -2,7 +2,7 @@ const {spawnSync}=require('node:child_process'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const build=spawnSync(process.execPath,['scripts/build.cjs'],{cwd:root,stdio:'inherit'});
 if(build.status!==0)process.exit(build.status||1);
-for(const file of ['browser-smoke','polish-smoke','progression-smoke','homestead-smoke','variants-smoke','continuity-smoke','play-loop-smoke','crop-life-smoke','toy-smoke','food-pantry-smoke','playground-smoke','land-expansion-smoke','quest-revival-smoke','labor-season-smoke','family-profiles-smoke']){
+for(const file of ['browser-smoke','polish-smoke','progression-smoke','homestead-smoke','variants-smoke','continuity-smoke','play-loop-smoke','crop-life-smoke','toy-smoke','food-pantry-smoke','playground-smoke','land-expansion-smoke','quest-revival-smoke','labor-season-smoke','family-profiles-smoke','breed-revival-smoke']){
  console.log('\nRunning '+file);
  const result=spawnSync(process.execPath,[path.join(__dirname,file+'.cjs')],{cwd:root,stdio:'inherit'});
  if(result.status!==0)process.exit(result.status||1);
